@@ -1,46 +1,50 @@
-const WorkToken = artifacts.require("WorkToken");
+const Token = artifacts.require("WATT");
 const WRStorage = artifacts.require("WorkRecordsStorage");
 
 const OneToken = web3.toBigNumber(1).mul(10**18);
-const Sha256 = [
-    '0x7ea6f7c2709cdd0838909fef0fb1a9839477feca1cea344b3d710904ff29095f',
-    '0x63e5dedd9326c390b9d1cb2336d8e5072733930e5c2a9a6495f5ae1aabac60e3',
-    '0xbc52d6bfe3ac965e069109dbd7d15e0ccaaa55678f6e2a6664bee2edf8ae1b2b'
+const hashes = [
+    '0xf5f69112af86801565fed2cea7508e5e',
+    '0x6d63bf5dcba233e43320180c54cf5850',
+    '0x521dad65a6c5a67c9a688451d659ffc5'
 ];
 
 contract("AddWorkRecord", function ([owner, user1, user2]) {
 
-    let workToken;
+    let token;
     let wrStorage;
 
     before('Initializing contracts and token transfers', async function () {
 
-        workToken = await WorkToken.new();
-        wrStorage = await WRStorage.new(workToken.address);
+        token = await Token.new();
+        wrStorage = await WRStorage.new(token.address);
 
-        await workToken.transfer(user1, OneToken);
+        await token.transfer(user1, OneToken);
 
     })
     it('Verifying setup', async function () {
 
-        const user1Balance = await workToken.balanceOf(user1);
-        const user2Balance = await workToken.balanceOf(user2);
+        const user1Balance = await token.balanceOf(user1);
+        const user2Balance = await token.balanceOf(user2);
         assert.equal(OneToken.toNumber(), user1Balance.toNumber());
         assert.equal(0, user2Balance.toNumber());
 
     });
-    it('Testing if member can add WorkRecord', async function () {
+
+
+
+
+    it('Member can add WorkRecord', async function () {
 
         try {
-            await wrStorage.addWorkRecord(1, Sha256[0], {from: user1});
+            await wrStorage.addWorkRecord(1, hashes[0], {from: user1});
         } catch (error) {
             assert.fail("Failed to protect from adding WorkRecord by user that don't have rights");
         }
     });
-    it('Testing if non-member will fail in add WorkRecord', async function () {
+    it('Non-member will fail to add WorkRecord', async function () {
 
         try {
-            await wrStorage.addWorkRecord(2, Sha256[1], {from: user2})
+            await wrStorage.addWorkRecord(2, hashes[1], {from: user2})
         } catch (error) {
             return;
         }
@@ -48,18 +52,22 @@ contract("AddWorkRecord", function ([owner, user1, user2]) {
         assert.fail("Failed to protect from adding WorkRecord by user that don't have rights");
 
     });
-    it('Testing if owner can add WorkRecord for user1', async function () {
+
+
+
+
+    it('Owner can add WorkRecord for member', async function () {
 
         try {
-            await wrStorage.ownerAddWorkRecord(user1, 3, Sha256[2], {from: owner});
+            await wrStorage.ownerAddWorkRecord(user1, 3, hashes[2], {from: owner});
         } catch (error) {
             assert.fail("Failed to protect from adding WorkRecord by user that don't have rights");
         }
     });
-    it('Testing if user1 can\'t use ownerOnly function', async function () {
+    it('Owner can\'t add WorkRecord for non-member', async function () {
 
         try {
-            await wrStorage.ownerAddWorkRecord(user2, 4, Sha256[0], {from: user1})
+            await wrStorage.ownerAddWorkRecord(user2, 4, hashes[0], {from: owner})
         } catch (error) {
             return;
         }
@@ -67,6 +75,21 @@ contract("AddWorkRecord", function ([owner, user1, user2]) {
         assert.fail("Failed to protect from adding WorkRecord by user that don't have rights");
 
     });
+    it('Non-owner can\'t use ownerOnly function', async function () {
+
+        try {
+            await wrStorage.ownerAddWorkRecord(user2, 4, hashes[0], {from: user1})
+        } catch (error) {
+            return;
+        }
+
+        assert.fail("Failed to protect from adding WorkRecord by user that don't have rights");
+
+    });
+
+
+
+
     it('Verifying number of events', async function () {
 
         wrStorage.WorkRecord({}, { fromBlock: 0, toBlock: 'latest' }).get((error, results) => {

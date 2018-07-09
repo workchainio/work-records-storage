@@ -1,8 +1,25 @@
 {
   "name": "work-records-storage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "WorkChain.io's contrctr for storing work records using ethereum event log storage",
-  "main": "index.js",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/workchainio/work-records-storage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/workchainio/work-records-storage/issues"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "watt",
+    "workchain",
+    "workchain.io"
+  ],
   "scripts": {
     "start": "truffle compile",
     "test": "truffle test",
@@ -10,18 +27,9 @@
   },
   "author": "Ivan Petrovic",
   "license": "ISC",
-  "keywords": [
-    "blockchain",
-    "ethereum",
-    "erc20",
-    "watt",
-    "workchain",
-    "workchain.io"
-  ],
   "homepage": "https://workchain.io",
   "dependencies": {
-    "web3": "^1.0.0-beta.34",
-    "work-token": "git+https://github.com/workchainio/work-token.git"
+    "watt-token": "git+https://github.com/workchainio/watt-token.git"
   },
   "devDependencies": {
     "truffle": "^4.1.11"
