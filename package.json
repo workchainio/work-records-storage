@@ -23,6 +23,7 @@
   "scripts": {
     "start": "truffle compile",
     "test": "truffle test",
+    "migrate": "truffle migrate",
     "version": "truffle version"
   },
   "author": "Ivan Petrovic",
